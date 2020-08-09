@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+
+  <div class="container">
+  <section class="content">
+    <!-- Small boxes (Stat box) -->
+    <div class="row">
+      <div class="col-md-12 col-xs-12">
+
+        <div id="messages"></div>
+
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title">Add Order</h3>
+          </div>
+          <!-- /.box-header -->
+          <form role="form" action="" method="post" class="form-horizontal">
+              <div class="box-body">
+
+                
+                
+                <br/><br/>
+                <table class="table table-bordered" id="product_info_table">
+                  <thead>
+                    <tr>
+                      <th style="width:50%">Product</th>
+                      <th style="width:10%">Qty</th>
+                      <th style="width:10%">Rate</th>
+                      <th style="width:20%">Amount</th>
+                      {% if items %}
+                        <th style="width:10%"><a href="{% url 'orders:clear_item' %}" role="button" id="add_row" class="btn btn-warning">Clear</a></th>
+                      {% else %}
+                      <th style="width:10%"><button type="button" id="add_row" class="btn btn-default"><i class="fa fa-plus"></i></button></th>
+                      {% endif %}
+                    </tr>
+                  </thead>
+
+                   <tbody>
+                    <tr id="row_1">
+                      <form id="post-form" method="POST" action="{% url 'orders:add_order' %}">
+                        {% csrf_token %}
+                        <td>
+                          <select class="form-control select_group product" data-row-id="row_1" id="product" name="product" style="width:100%;" onchange="getProductData(1)" required>
+                            <option value="">--None--</option>
+                            {% for product in products %}
+                            
+                              <option value="{{product.title}}">{{product.title}}</option> 
+                        
+                              {% endfor %}  
+                          </select>
+                          </td>
+                          <td><input type="number" max="100" min="1" name="quantity" id="quantity" class="form-control" required onkeyup="getTotal(1)"></td>
+                          <td>
+                            <input type="number" name="rate" id="rate" class="form-control" value='{{rate}}' disabled autocomplete="on">
+                            <input type="hidden" name="rate_value" id="rate_value_1" class="form-control" autocomplete="on">
+                          </td>
+                          <td>
+                            <input type="number" name="amount" id="amount" class="form-control" value='{{amount}}' disabled autocomplete="on">
+                            <input type="hidden" name="amount_value[]" id="amount_value_1" class="form-control" autocomplete="on">
+                          </td>
+                          <td><button type="submit"  class="btn btn-primary">+</button></td>
+                      </form>    
+                    </tr>
+
+                    
+
+                    {% for item in items %}
+                    <form method="POST"> 
+                      {% csrf_token %}
+                      <tr>
+                        <td>
+                          <input type="text" name="product" id="rate_1" class="form-control" value='{{ item.productID.title }}' disabled autocomplete="on">
+                          <input type="hidden" name="rate_value" id="rate_value_1" class="form-control" autocomplete="on">
+                        </td>
+                        <td>
+                          <input type="number" name="quantity" id="rate_1" class="form-control" value='{{item.quantity}}' disabled autocomplete="on">
+                          <input type="hidden" name="rate_value" id="rate_value_1" class="form-control" autocomplete="on">
+                        </td>
+                        <td>
+                          <input type="number" name="rate" id="rate_1" class="form-control" value='{{item.productID.price}}' disabled autocomplete="on">
+                          <input type="hidden" name="rate_value" id="rate_value_1" class="form-control" autocomplete="on">
+                        </td>
+                        <td>
+                          <input type="number" name="amount" id="rate_1" class="form-control" value='{{item.total}}' disabled autocomplete="on">
+                          <input type="hidden" name="rate_value" id="rate_value_1" class="form-control" autocomplete="on">
+                        </td>
+                        <td><a href="{% url 'orders:delete_takeorder' item.pk %}" class="btn btn-danger" role="button">x</a></td>
+                      <!-- <td><button type="button" class="btn btn-default" onclick="removeRow('1')"><i class="fa fa-close"></i></button></td>-->
+                      </tr>
+                    </form>
+                    {% endfor %}
+                  
+
+                    
+
+
+                      
+                   </tbody>
+                </table>
+
+                <br /> <br/>
+                <div class="row">
+                <div class="col-md-6 col-12">
+                </div>
+                <div class="col-md-6 col-12 ">
+
+                  <div class="form-group">
+                    <label for="gross_amount" class="col-sm-5 control-label">Gross Amount</label>
+                    
+                    <div class="col-sm-7">
+                      {% if gross_amount %}
+                        <input type="text" value="{{gross_amount}}" class="form-control" id="gross_amount" name="gross_amount" disabled autocomplete="off">
+                      {% else%}
+                        <input type="text" class="form-control" id="gross_amount" name="gross_amount" disabled autocomplete="off">
+                      {% endif %}
+                      <input type="hidden" class="form-control" id="gross_amount_value" name="gross_amount_value" autocomplete="off">
+                    </div>
+                  </div>
+                  <form>
+                      {% csrf_token %}
+                    <div class="form-group">
+                      <label for="discount" class="col-sm-5 control-label">Discount %</label>
+                      <div class="col-sm-7">
+                        <input type="number" class="form-control" id="discount" name="discount" placeholder="Discount" onkeyup="subAmount()" autocomplete="off">
+                        <input class="btn btn-primary btn-user btn-block" type="submit" value='Apply'>
+                      </div>
+                    </div>
+                  </form>
+                  <form  action="{% url 'orders:checkout' %}">
+                    <div class="form-group" style="margin-top: 20px;">
+                      <label for="net_amount" class="col-sm-5 control-label">Net Amount</label>
+                      <div class="col-sm-7">
+                        <input type="text" class="form-control" id="net_amount" value="{{net_amount}}" name="net_amount" disabled autocomplete="off">
+                        <input type="hidden" class="form-control" id="net_amount_value" name="net_amount_value" autocomplete="off">
+                  </form>
+                      
+                    </div>
+                  </div>
+                  <div class="box-footer mx-3">
+                    <input type="hidden" name="service_charge_rate"  autocomplete="off">
+                    <input type="hidden" name="vat_charge_rate"  autocomplete="off">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCart">Create Order</button>
+                    <a href="" class="btn btn-warning">Back</a>
+                  </div>
+
+
+
+
+
+                    <!-- Button trigger modal-->
+
+
+<!-- Modal: modalCart -->
+<div class="modal fade" id="modalCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <!--Header-->
+      <div class="modal-header">
+        
+          <h4 class="modal-title" id="myModalLabel">Customer Details </h4>
+        
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <!--Body-->
+      <form name="checkout-form" method="POST" enctype="multipart/form-data" action="{% url 'orders:checkout' %}">
+        <div class="modal-body">
+          <div class="modal-body mx-3">
+
+
+
+
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-6">
+                {{ form.name|as_crispy_field }}
+              </div>
+
+              <div class="col-6">
+                {{ form.phone|as_crispy_field }}
+              </div>
+
+              <div class="col-6">
+                {{ form.email|as_crispy_field }}
+              </div>
+      
+              
+              
+              <div class="col-6">
+                {{ form.city|as_crispy_field }}
+              </div>
+              
+              <div class="col-6">
+                {{ form.state|as_crispy_field }}
+              </div>
+              
+              <div class="col-6">
+                {{ form.country|as_crispy_field }}
+              </div>
+              
+              
+            </div>
+            {{ form.address|as_crispy_field }}
+          
+          
+          </div>
+
+        </div>
+        <!--Footer-->
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Close</button>
+            <input class="btn btn-primary" value="Checkout" type="submit">
+          </div>
+      </form>
+      </div>
+    </div>
+  </div>
+<!-- Modal: modalCart -->
+
+
+
+
+                  </div>
+                </div>
+              </div>
+              </div>
+              <!-- /.box-body -->
+
+          
+            </form>
+          <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+      </div>
+      <!-- col-md-12 -->
+    </div>
+    <!-- /.row -->
+    
+
+  </section>
+</div>
+
+
+
+
+  
+  
+{% endblock %}

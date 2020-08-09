@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <h1 class="h3 mb-2 text-gray-800">Current Order List</h1>
+        </br></br>
+          <!-- DataTales Example -->
+          <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Confirm, Cancel or Check Order </h6>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                  <thead>
+                    <tr style="text-align: center;">
+                      <th>Customer Name</th>
+                      <th>Order ID</th>
+                      <th>Amount</th>
+                      <th>Date & Time</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <!-- <tfoot>
+                    <tr>
+                      <th>Name</th>
+                      <th>Position</th>
+                      <th>Office</th>
+                      <th>Age</th>
+                      <th>Start date</th>
+                      <th>Salary</th>
+                    </tr>
+                  </tfoot> -->
+                  <tbody>
+                    {% if order_list %}
+                      
+                        {% for row in order_list %}
+                        <form method="POST" name="action-form"  action="{% url 'orders:action' row.pk %}">
+                          {% csrf_token %}
+                          <tr>
+                            <td>{{row.customer_name}}</td>
+                            <td><input name="order_id" disabled style="border: 0; color: gray; width: 100px;"  value="{{row.order_id}}"></td>
+                            <td>{{row.amount}}</td>
+                            <td>{{row.Date_Time}}</td>
+                            <td>
+                                <button name="confirm" type="submit" value="confirm-order" class="btn btn-success" >Confirm Order</button> |
+                                <button name="cancel" type="submit" value="cancel-order" class="btn btn-danger" >Cancel Order</button> |
+                                <!-- <button name="order_detail" type="submit" value="order-detail" class="btn btn-warning" >Order Detail</button> -->
+                                
+                                <button type="submit" name="order_detail" class="btn btn-dark" data-toggle="modal" data-target="#modalCart">Order Detail</button>
+
+
+                                                                <!-- Modal: modalCart -->
+                                <div class="modal fade" id="modalCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                  <div class="modal-content">
+                                    <!--Header-->
+                                    <div class="modal-header">
+                                      <h4 class="modal-title" id="myModalLabel">Order Detail</h4>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                      </button>
+                                    </div>
+                                    <!--Body-->
+                                    <div class="modal-body">
+
+                                      <table class="table table-hover">
+                                        <thead>
+                                          <tr>
+                                            <th>ProductID</th>
+                                            <th>Product name</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                            <th>Total</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {% for product in products %}
+                                            <tr>
+                                              <!-- <th scope="row">1</th> -->
+                                              <td>{{product.productID.id}}</td>
+                                              <td>{{product.productID.title}}</td>
+                                              <td>{{product.quantity}}</td>
+                                              <td>{{product.rate}}</td>
+                                              <td>{{product.total}}</td>
+                                              <!-- <td><a><i class="fas fa-times"></i></a></td> -->
+                                            </tr>
+                                          {% endfor %}
+                                        </tbody>
+                                      </table>
+
+                                    </div>
+                                    <!--Footer-->
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Close</button>
+                                      
+                                    </div>
+                                  </div>
+                                </div>
+                                </div>
+                                <!-- Modal: modalCart -->
+
+
+
+
+
+
+
+
+
+                            </td>
+                          </tr>
+                        </form>
+                        {% endfor %}
+                    {% endif %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+{% endblock %}

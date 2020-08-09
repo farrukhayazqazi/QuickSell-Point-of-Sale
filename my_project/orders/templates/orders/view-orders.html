@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <h1 class="h3 mb-2 text-gray-800">View Orders</h1>
+        </br></br>
+          <!-- DataTales Example -->
+          <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Check the status of the order </h6>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                  <thead>
+                    <tr style="text-align: center;">
+                      <th>Customer Name</th>
+                      <th>Order ID</th>
+                      <th>Discounted Amount</th>
+                      <th>Net Amount</th>
+                      <th>Order Staus</th>
+                    </tr>
+                  </thead>
+                  <!-- <tfoot>
+                    <tr>
+                      <th>Name</th>
+                      <th>Position</th>
+                      <th>Office</th>
+                      <th>Age</th>
+                      <th>Start date</th>
+                      <th>Salary</th>
+                    </tr>
+                  </tfoot> -->
+                  <tbody>
+                    {% for row in orders %}
+                    <form method="POST" name="action-form"  action="{% url 'orders:view-order' %}">
+                      {% csrf_token %}
+                      <tr>
+                        <td>{{row.CustomerID.name}}</td>
+                        <td>{{row.id}}</td>
+                        <td>{{row.discount}}</td>
+                        <td>{{row.net_amount}}</td>
+                        <td>{{row.status}}</td>
+                      </tr>
+                    </form>
+                    {% endfor %}
+                    
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+{% endblock %}
